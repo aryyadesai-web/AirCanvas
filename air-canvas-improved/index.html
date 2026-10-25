@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090b12" />
+  <title>Air Canvas — Draw in the Air</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Air Canvas home">
+        <span class="brand-icon">✳</span>
+        <span><strong>air canvas</strong><small>gesture drawing studio</small></span>
+      </a>
+      <div class="status-group">
+        <span class="status"><i id="modelDot"></i><span id="modelStatus">MODEL LOADING</span></span>
+        <span class="status"><i id="handDot"></i><span id="handStatus">HAND NOT FOUND</span></span>
+        <span class="status gesture-status" id="gestureStatus">READYING CAMERA</span>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <div class="canvas-panel">
+        <div class="panel-heading">
+          <div><span class="eyebrow">LIVE CANVAS</span><h1>Make something<br><em>out of thin air.</em></h1></div>
+          <span class="live-pill"><span></span> LIVE</span>
+        </div>
+        <div class="stage" id="stage">
+          <video id="webcam" autoplay muted playsinline></video>
+          <canvas id="drawingCanvas" aria-label="Your drawing"></canvas>
+          <canvas id="cursorCanvas" aria-hidden="true"></canvas>
+          <div class="stage-hint" id="stageHint">
+            <span class="hint-icon">✋</span>
+            <strong>Show your hand to begin</strong>
+            <span>Point with your index finger to draw</span>
+          </div>
+          <div class="stage-corner corner-tl"></div><div class="stage-corner corner-tr"></div>
+          <div class="stage-corner corner-bl"></div><div class="stage-corner corner-br"></div>
+          <div class="camera-label"><span class="camera-dot"></span> CAMERA INPUT</div>
+        </div>
+        <div class="under-stage">
+          <span id="modeText">Waiting for hand</span>
+          <span class="shortcut"><kbd>C</kbd> clear <kbd>U</kbd> undo <kbd>S</kbd> save</span>
+        </div>
+      </div>
+
+      <aside class="tool-panel">
+        <div class="tool-panel-heading"><span class="eyebrow">YOUR TOOLKIT</span><span class="tool-count">01 / 04</span></div>
+        <section class="tool-section">
+          <div class="section-title"><span>01</span><h2>Ink color</h2></div>
+          <div class="swatches" id="swatches">
+            <button class="swatch selected" data-color="#f7f7fb" style="--swatch:#f7f7fb" aria-label="White" title="White"></button>
+            <button class="swatch" data-color="#8b5cf6" style="--swatch:#8b5cf6" aria-label="Violet" title="Violet"></button>
+            <button class="swatch" data-color="#22d3ee" style="--swatch:#22d3ee" aria-label="Cyan" title="Cyan"></button>
+            <button class="swatch" data-color="#fb7185" style="--swatch:#fb7185" aria-label="Pink" title="Pink"></button>
+            <button class="swatch" data-color="#fbbf24" style="--swatch:#fbbf24" aria-label="Amber" title="Amber"></button>
+            <button class="swatch" data-color="#4ade80" style="--swatch:#4ade80" aria-label="Green" title="Green"></button>
+          </div>
+        </section>
+
+        <section class="tool-section">
+          <div class="section-title"><span>02</span><h2>Brush size</h2><output id="brushValue">8 px</output></div>
+          <input id="brushSize" class="range" type="range" min="2" max="28" value="8" />
+          <div class="range-labels"><span>FINE</span><span>BOLD</span></div>
+        </section>
+
+        <section class="tool-section">
+          <div class="section-title"><span>03</span><h2>How to draw</h2></div>
+          <div class="gesture-card">
+            <div class="gesture-symbol">☝</div><div><strong>Point to draw</strong><small>Keep only your index finger raised</small></div><span class="gesture-key">DRAW</span>
+          </div>
+          <div class="gesture-card">
+            <div class="gesture-symbol">✊</div><div><strong>Make a fist</strong><small>Erase as you move your hand</small></div><span class="gesture-key erase-key">ERASE</span>
+          </div>
+          <div class="gesture-card">
+            <div class="gesture-symbol">🖐</div><div><strong>Open your palm</strong><small>Pause drawing without losing ink</small></div><span class="gesture-key pause-key">PAUSE</span>
+          </div>
+        </section>
+
+        <section class="tool-section actions-section">
+          <div class="section-title"><span>04</span><h2>Canvas actions</h2></div>
+          <div class="action-row">
+            <button class="action-btn" id="undoBtn"><span>↶</span> Undo</button>
+            <button class="action-btn" id="clearBtn"><span>⌫</span> Clear</button>
+          </div>
+          <button class="save-btn" id="saveBtn"><span>↓</span> Export drawing <span class="save-arrow">↗</span></button>
+          <p class="privacy-note"><span>◉</span> Camera processing stays in your browser.</p>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="footer"><span>BUILT FOR HANDS, NOT MICE</span><span>HTML · CANVAS · MEDIAPIPE</span></footer>
+  </main>
+
+  <div class="overlay" id="overlay">
+    <div class="overlay-card">
+      <div class="loader-mark">✳</div>
+      <span class="eyebrow">AIR CANVAS STUDIO</span>
+      <h2 id="overlayTitle">Getting things ready</h2>
+      <p id="overlayMessage">Allow camera access, then start drawing with your hand.</p>
+      <button id="startBtn" class="save-btn">Enable camera <span class="save-arrow">→</span></button>
+      <small>Camera access works on localhost or HTTPS.</small>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
